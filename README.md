@@ -5,3 +5,4 @@ The goal of this project was to make a website that can be used as personal plan
 
 Installation
 All functionality of this project contained within the deployed webpage itself. Users can navigate to the following address to experience the application:
+https://sudarshans30.github.io/work-Day-Schedular/
