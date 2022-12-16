@@ -1,66 +1,73 @@
-
 $(document).ready(function() {
-  
-  $('#currentDay').text(moment().format('dddd, MMMM Do YYYY'));
+ 
+  var currentDate = moment().format('dddd, MMMM Do');
 
-  var hour = ["10","11","12","13","14","15","16","17"];
+  $('#currentDay').text(currentDate);
 
-  for(i=0; i<hour.length; i++ ){
-    var row = $("<div>");
-    row.addClass("row time-block past");
-    var hour =$("<div>");
-    if(hour[i] > 12){
-      hour.addClass("col-2 col-md-1 hour text-center py-3").text(hour[i]-12 +":00");
-      row.append(hour);
-      } else{
-        hour.addClass("col-2 col-md-1 hour text-center py-3").text(hour[i]+ ":00");
-        row.append(hour);
-      }
-  }
+  var currentHour = moment().format('H');
 
-  
   $('.time-block').each(function() {
    
-    var hour = $(this).attr('id').split('-')[1];
+    var blockHour = $(this).attr('id').split('-')[1];
 
-    
-    if (hour < moment().hour()) {
-    
-      $(this).addClass('past');
-    } else if (hour > moment().hour()) {
-    
-      $(this).addClass('future');
-    } else {
+    var Hours = ["10", "11", "12", "13", "14", "15", "16", "17"];
+
   
+    
+    // CREATING ROW ELEMENTS
+    for (i = 9; i < 17; i++) {
+      var row = $("<div>");
+      row.addClass("row time-block");
+      var hour = $("<div>");
+      if (Hours[i] > 12) {
+        hour.addClass("col-2 col-md-1 hour text-center").text(Hours[i] - 12 + ":00");
+        row.append(hour);
+      } else {
+        hour.addClass("col-2 col-md-1 hour text-center").text(Hours[i] + ":00");
+        row.append(hour);
+      }
+
+
+    }
+
+    if (blockHour < currentHour) {
+      $(this).addClass('past');
+    } 
+    else if (blockHour == currentHour) {
       $(this).addClass('present');
+    } 
+    else {
+      $(this).addClass('future');
     }
   });
+});
+
+$('.time-block').on('click', function() {
+  
+  var textarea = $(this).find('.description');
 
   
-  $('.saveBtn').click(function() {
-    
-    var text = $(this).siblings('.description').val();
-
-    var hour = $(this).parent().attr('id').split('-')[1];
-
-   
-    localStorage.setItem(hour, text);
-  });
-
-
-  $(window).on('beforeunload', function() {
- 
-    $('.time-block').each(function() {
-
-      var hour = $(this).attr('id').split('-')[1];
-
-      var text = localStorage.getItem(hour);
-
-      
-      if (text) {
-       
-        $(this).find('.description').val(text);
-      }
-    });
-  });
+  textarea.focus();
 });
+
+$('.saveBtn').on('click', function() {
+  
+  var timeBlock = $(this).closest('.time-block');
+
+  
+  var hour = timeBlock.attr('id').split('-')[1];
+
+  var event = timeBlock.find('.description').val();
+
+  localStorage.setItem(hour, event);
+});
+
+
+
+
+
+
+
+
+
+
