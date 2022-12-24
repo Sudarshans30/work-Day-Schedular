@@ -1,68 +1,111 @@
+
 $(document).ready(function() {
- 
-  var currentDate = moment().format('dddd, MMMM Do');
-
-  $('#currentDay').text(currentDate);
-
-  var currentHour = moment().format('H');
-
-  $('.time-block').each(function() {
-   
-    var blockHour = $(this).attr('id').split('-')[1];
-
-    var Hours = ["10", "11", "12", "13", "14", "15", "16", "17"];
+  
+  $("#currentDay").text(moment().format("dddd, MMMM Do"));
 
   
-    
-    // CREATING ROW ELEMENTS
-    for (i = 9; i < 17; i++) {
-      var row = $("<div>");
-      row.addClass("row time-block");
-      var hour = $("<div>");
-      if (Hours[i] > 12) {
-        hour.addClass("col-2 col-md-1 hour text-center").text(Hours[i] - 12 + ":00");
-        row.append(hour);
-      } else {
-        hour.addClass("col-2 col-md-1 hour text-center").text(Hours[i] + ":00");
-        row.append(hour);
-      }
+  setInterval(function() {
+    updateTimeBlocks();
+  }, 60000);
 
+  
+  loadEvents();
 
-    }
-
-    if (blockHour < currentHour) {
-      $(this).addClass('past');
-    } 
-    else if (blockHour == currentHour) {
-      $(this).addClass('present');
-    } 
-    else {
-      $(this).addClass('future');
-    }
+  $(".saveBtn").on("click", function() {
+    var timeBlockId = $(this).parent().attr("id");
+    var eventText = $(this)
+      .siblings(".description")
+      .val();
+    saveEvent(timeBlockId, eventText);
   });
 });
 
-$('.time-block').on('click', function() {
-  
-  var textarea = $(this).find('.description');
+
+// INCREASING TIME BLOCKS BY USING FOR LOOP
+for (let i = 10; i <= 17; i++) {
+ 
+  const timeBlock = document.createElement("div");
+  timeBlock.classList.add("row", "time-block");
+  timeBlock.id = `hour-${i}`;
+
+
+  const hour = document.createElement("div");
+  hour.classList.add("col-2", "col-md-1", "hour", "text-center", "py-3");
+  hour.innerHTML = `${i}AM`;
+  timeBlock.appendChild(hour);
+
+  let displayPeriod = "AM";
+  if (i >= 12) {
+    displayPeriod = "PM";
+  }
+
+  let displayHour = i;
+  if (i > 12) {
+    displayHour -= 12;
+  }
+  hour.innerHTML = `${displayHour}${displayPeriod}`;
+  timeBlock.appendChild(hour);
 
   
-  textarea.focus();
-});
+  const textarea = document.createElement("textarea");
+  textarea.classList.add("col-8", "col-md-10", "description");
+  textarea.rows = 3;
+  timeBlock.appendChild(textarea);
 
-$('.saveBtn').on('click', function() {
+ 
+  const saveButton = document.createElement("button");
+  saveButton.classList.add("btn", "saveBtn", "col-2", "col-md-1");
+  saveButton.setAttribute("aria-label", "save");
+  saveButton.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i>';
+  timeBlock.appendChild(saveButton);
+
   
-  var timeBlock = $(this).closest('.time-block');
+  const container = document.querySelector(".container-fluid");
+  container.appendChild(timeBlock);
+}
 
+
+function updateTimeBlocks() {
+
+  var currentHour = moment().hours();
+
+  $(".time-block").each(function() {
+    var timeBlockHour = parseInt($(this).attr("id").split("-")[1]);
+
+    if (timeBlockHour < currentHour) {
+      $(this).addClass("past");
+      $(this).removeClass("present future");
+    }
+    else if (timeBlockHour === currentHour) {
+      $(this).addClass("present");
+      $(this).removeClass("past future");
+    }
   
-  var hour = timeBlock.attr('id').split('-')[1];
+    else {
+      $(this).addClass("future");
+      $(this).removeClass("past present");
+    }
+  });
+}
 
-  var event = timeBlock.find('.description').val();
+function saveEvent(timeBlockId, eventText) {
 
-  localStorage.setItem(hour, event);
-});
+  localStorage.setItem(timeBlockId, eventText);
+}
 
+function loadEvents() {
+ 
+  $(".time-block").each(function() {
+    var timeBlockId = $(this).attr("id");
+    var eventText = localStorage.getItem(timeBlockId);
 
+    if (eventText) {
+      $(this)
+        .find(".description")
+        .val(eventText);
+    }
+  });
+}
 
 
 
