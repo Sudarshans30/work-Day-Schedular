@@ -6,7 +6,7 @@ $(document).ready(function() {
   
   setInterval(function() {
     updateTimeBlocks();
-  }, 60000);
+  });
 
   
   loadEvents();
